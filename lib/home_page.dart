@@ -1,6 +1,7 @@
 import 'package:asky/feature_box.dart';
 import 'package:asky/pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,6 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final speechToText = SpeechToText();
+  String lastwords = '';
 
   @override
   void initState() {
@@ -23,6 +25,40 @@ class _HomePageState extends State<HomePage> {
     await speechToText.initialize();
     setState(() {}); // after initializing, update the state
   }
+
+  //////////////////////////////speech to text//////////////////////////////////
+
+  /// Each time to start a speech recognition session
+  Future<void> startListening() async {
+    await speechToText.listen(onResult: onSpeechResult);
+    setState(() {});
+  }
+
+  /// Manually stop the active speech recognition session
+  /// Note that there are also timeouts that each platform enforces
+  /// and the SpeechToText plugin supports setting timeouts on the
+  /// listen method.
+  Future<void> stopListening() async {
+    await speechToText.stop();
+    setState(() {});
+  }
+
+  /// This is the callback that the SpeechToText plugin calls when
+  /// the platform returns recognized words.
+  void onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      lastwords = result.recognizedWords;
+    });
+  }
+
+// once user leaves the page, stop listening
+  @override
+  void dispose() {
+    super.dispose();
+    speechToText.stop();
+  }
+
+  //////////////////////////////speech to text//////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +178,13 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Pallete.firstSuggestionBoxColor,
-        onPressed: () {},
+        onPressed: () async {
+          if (await speechToText.hasPermission && speechToText.isNotListening) {
+            startListening();
+          } else if (speechToText.isListening) {
+            stopListening();
+          }
+        },
         child: const Icon(Icons.mic),
       ),
     );
