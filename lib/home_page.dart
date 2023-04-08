@@ -1,5 +1,7 @@
+import 'package:asky/feature_box.dart';
 import 'package:asky/pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,15 +11,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final speechToText = SpeechToText();
+
+  @override
+  void initState() {
+    super.initState();
+    initSpeechToText();
+  }
+
+  Future<void> initSpeechToText() async {
+    await speechToText.initialize();
+    setState(() {}); // after initializing, update the state
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Asky'),
-          centerTitle: true,
-          leading: const Icon(Icons.menu),
-        ),
-        body: Column(
+      appBar: AppBar(
+        title: const Text('Asky'),
+        centerTitle: true,
+        leading: const Icon(Icons.menu),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           // adding elements on homepage as columns
           children: [
             // virtual assistant picture
@@ -62,6 +78,7 @@ class _HomePageState extends State<HomePage> {
                 border: Border.all(
                   color: Pallete.borderColor,
                 ),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -75,7 +92,59 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              alignment: Alignment.center,
+              margin: const EdgeInsets.only(
+                top: 10,
+                left: 22,
+              ),
+              child: const Text(
+                'Here are a few features',
+                style: TextStyle(
+                  fontFamily: 'Cera Pro',
+                  color: Pallete.mainFontColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            // suggestions list
+            const Column(
+              children: [
+                FeatureBox(
+                  color: Pallete.firstSuggestionBoxColor,
+                  headerText: 'ChatGPT',
+                  descriptionText:
+                      'A smarter way to stay organized and informed with ChatGPT',
+                ),
+                //////////////////////////////////////////////////////////////////
+                FeatureBox(
+                  color: Pallete.secondSuggestionBoxColor,
+                  headerText: 'DALL-E',
+                  descriptionText:
+                      'Personal DALL-E assistant to help you find the perfect image',
+                ),
+                //////////////////////////////////////////////////////////////////
+                FeatureBox(
+                  color: Pallete.thirdSuggestionBoxColor,
+                  headerText: 'Smart Voice Assistant',
+                  descriptionText:
+                      'Get the best of both worlds with a voice assistant powered by GPT-3',
+                ),
+              ],
+            ),
           ],
-        ));
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Pallete.firstSuggestionBoxColor,
+        onPressed: () {},
+        child: const Icon(Icons.mic),
+      ),
+    );
   }
 }
