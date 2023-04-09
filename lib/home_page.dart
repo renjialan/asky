@@ -180,9 +180,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Pallete.firstSuggestionBoxColor,
         onPressed: () async {
           if (await speechToText.hasPermission && speechToText.isNotListening) {
-            startListening();
+            await startListening();
           } else if (speechToText.isListening) {
-            stopListening();
+            await stopListening();
+          } else {
+            initSpeechToText();
           }
         },
         child: const Icon(Icons.mic),
